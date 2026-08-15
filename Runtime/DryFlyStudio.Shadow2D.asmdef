@@ -1,0 +1,14 @@
+{
+    "name": "DryFlyStudio.Shadow2D",
+    "rootNamespace": "DryFlyStudio",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -2,7 +2,7 @@
 // Shadows render one queue earlier, so the caster always paints over its own
 // shadow; the depth write additionally keeps later-drawn shadows from
 // crossing casters that sit at a nearer Z.
-Shader "SleepyHeadStudios/SpriteWithShadowBlock"
+Shader "DryFlyStudio/SpriteWithShadowBlock"
 {
     Properties
     {
