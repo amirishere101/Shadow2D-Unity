@@ -1,0 +1,22 @@
+{
+  "name": "com.sleepyheadstudios.shadow2d",
+  "version": "1.1.0",
+  "displayName": "Shadow2D",
+  "description": "Cheap drop shadows for 2D sprites, split into static and dynamic components because most objects in a scene never move. No lighting system required. Includes a brush tool for painting custom silhouettes.",
+  "unity": "2021.3",
+  "documentationUrl": "https://github.com/amirishere101/Shadow2D-Unity",
+  "changelogUrl": "https://github.com/amirishere101/Shadow2D-Unity/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/amirishere101/Shadow2D-Unity/blob/main/LICENSE.md",
+  "keywords": [
+    "2d",
+    "shadow",
+    "sprite",
+    "topdown",
+    "top-down"
+  ],
+  "author": {
+    "name": "Amir Hawasly (SleepyHead Studios)",
+    "url": "https://github.com/amirishere101"
+  },
+  "license": "MIT"
+}

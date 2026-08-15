@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9202ad2c2a374d24ca9e792236b81ef5, type: 3}
-  m_Name: Shadow2DConfig
-  m_EditorClassIdentifier: 
+  m_Name: Shadow2DConfigDefault
+  m_EditorClassIdentifier:
   useYSortingByDefault: 1
   defaultPosition: {x: 0, y: 0, z: 0.01}
   defaultRotationZ: 12.5
   defaultScale: {x: 1, y: 0.9, z: 1}
   defaultShadowColor: {r: 0, g: 0, b: 0, a: 0.5}
+  shadowSpriteMaterial: {fileID: 2100000, guid: 9a3f5c1e4b0d6e72a3c8d0f2b3e4a5c6, type: 2}
+  casterMaterial: {fileID: 2100000, guid: 0b4a6d2f5c1e7f83b4d9e1a3c4f5b6d7, type: 2}
+  replaceCasterMaterial: 0

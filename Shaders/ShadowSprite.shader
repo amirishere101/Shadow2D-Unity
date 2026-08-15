@@ -1,29 +1,44 @@
-Shader "SleepyHeadStudios/SpriteWithShadowBlock"
+// Sprite shader for generated shadows. Renders just before the regular
+// transparent queue and uses the stencil buffer so overlapping shadows
+// merge into one uniform patch instead of double-darkening.
+// Set Stencil Comparison to "Always" on the material to disable that.
+Shader "SleepyHeadStudios/ShadowSprite"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
+
+        [Header(Overlap Handling)]
+        [Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil Comparison", Float) = 6
+        [Enum(UnityEngine.Rendering.StencilOp)] _StencilOp ("Stencil Pass Op", Float) = 2
+        _StencilRef ("Stencil Ref", Range(0, 255)) = 64
     }
 
     SubShader
     {
         Tags
-        { 
-            "Queue"="Transparent" 
-            "IgnoreProjector"="True" 
-            "RenderType"="Transparent" 
+        {
+            "Queue"="Transparent-1"
+            "IgnoreProjector"="True"
+            "RenderType"="Transparent"
             "PreviewType"="Plane"
             "CanUseSpriteAtlas"="True"
-            "RenderPipeline"=""
         }
 
         Cull Off
         Lighting Off
-        ZWrite On
+        ZWrite Off
         ZTest LEqual
         Blend One OneMinusSrcAlpha
+
+        Stencil
+        {
+            Ref [_StencilRef]
+            Comp [_StencilComp]
+            Pass [_StencilOp]
+        }
 
         Pass
         {
@@ -32,7 +47,6 @@ Shader "SleepyHeadStudios/SpriteWithShadowBlock"
             #pragma fragment frag
             #pragma target 2.0
             #pragma multi_compile _ PIXELSNAP_ON
-            #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnityCG.cginc"
 
             struct appdata_t
@@ -65,11 +79,13 @@ Shader "SleepyHeadStudios/SpriteWithShadowBlock"
             }
 
             sampler2D _MainTex;
-            sampler2D _AlphaTex;
 
             fixed4 frag(v2f IN) : SV_Target
             {
                 fixed4 c = tex2D(_MainTex, IN.texcoord) * IN.color;
+                // Discard fully transparent pixels so the sprite's empty rect
+                // doesn't stamp the stencil and block neighbouring shadows.
+                clip(c.a - 0.004);
                 c.rgb *= c.a;
                 return c;
             }

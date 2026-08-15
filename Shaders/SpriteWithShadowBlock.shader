@@ -1,4 +1,8 @@
-Shader "SleepyHeadStudios/ShadowSprite"
+// Sprites/Default equivalent with ZWrite enabled, applied to shadow casters.
+// Shadows render one queue earlier, so the caster always paints over its own
+// shadow; the depth write additionally keeps later-drawn shadows from
+// crossing casters that sit at a nearer Z.
+Shader "SleepyHeadStudios/SpriteWithShadowBlock"
 {
     Properties
     {
@@ -10,17 +14,17 @@ Shader "SleepyHeadStudios/ShadowSprite"
     SubShader
     {
         Tags
-        { 
-            "Queue"="Transparent-1" 
-            "IgnoreProjector"="True" 
-            "RenderType"="Transparent" 
+        {
+            "Queue"="Transparent"
+            "IgnoreProjector"="True"
+            "RenderType"="Transparent"
             "PreviewType"="Plane"
             "CanUseSpriteAtlas"="True"
         }
 
         Cull Off
         Lighting Off
-        ZWrite Off
+        ZWrite On
         ZTest LEqual
         Blend One OneMinusSrcAlpha
 
@@ -31,7 +35,6 @@ Shader "SleepyHeadStudios/ShadowSprite"
             #pragma fragment frag
             #pragma target 2.0
             #pragma multi_compile _ PIXELSNAP_ON
-            #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnityCG.cginc"
 
             struct appdata_t
@@ -64,7 +67,6 @@ Shader "SleepyHeadStudios/ShadowSprite"
             }
 
             sampler2D _MainTex;
-            sampler2D _AlphaTex;
 
             fixed4 frag(v2f IN) : SV_Target
             {
