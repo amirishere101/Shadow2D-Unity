@@ -1,14 +1,14 @@
 # Shadow2D
 
-Drop shadows for 2D sprites, split into two components because most objects in a scene never move.
+Drop shadows for 2D sprites that are lightweight and super easy to use.
 
-A shadow here is a child GameObject carrying its own SpriteRenderer. It copies the caster's sprite, matches flipX and flipY, tints itself dark, and sits underneath rotated 12.5 degrees and squashed to 90% height. Those defaults live in a config asset, and they're what sells the effect as light arriving at an angle rather than a decal stuck to the floor.
+A shadow is a child GameObject carrying its own SpriteRenderer. It copies the caster's sprite, matches flipX and flipY, tints itself dark, and sits underneath. The default settings live in a config asset, and they're what sells the effect as light arriving at an angle rather than a decal stuck to the floor, but you can use the rect tool in unity to shape the shadows however you would like.
 
 There's no lighting system to configure and nothing to set up first. Add the component and the shadow is there.
 
 ---
 
-**Using it:** [Install](#install) · [Quick start](#quick-start) · [Which component](#which-component) · [The inspector](#the-inspector) · [Custom shapes](#custom-shapes-and-the-shadow-brush) · [Several shadows](#several-shadows-on-one-caster) · [Positioning](#positioning-a-shadow) · [Following the caster](#following-the-caster) · [Scripting](#scripting) · [Config](#configuration)
+**Using it:** [Install](#install) · [Quick start](#quick-start) · [Static or Dynamic Component?](#which-component) · [The inspector](#the-inspector) · [Custom shapes](#custom-shapes-and-the-shadow-brush) · [Several shadows](#several-shadows-on-one-caster) · [Positioning](#positioning-a-shadow) · [Following the caster](#following-the-caster) · [Scripting](#scripting) · [Config](#configuration)
 
 **How it works:** [Sorting](#sorting) · [Self-masking](#not-casting-on-itself) · [Overlaps](#overlapping-shadows) · [Materials](#materials) · [Render pipelines](#render-pipelines) · [Duplicating](#duplicating-a-caster) · [Debugging](#debugging-the-mask) · [Limits](#limitations) · [Known issues](#known-issues)
 
@@ -22,12 +22,6 @@ Unity 2021.3 or newer. Nothing beyond the built-in 2D packages, and it works on 
 
 ```
 https://github.com/amirishere101/Shadow2D-Unity.git
-```
-
-**Or edit `Packages/manifest.json`** directly:
-
-```json
-"com.dryflystudio.shadow2d": "https://github.com/amirishere101/Shadow2D-Unity.git"
 ```
 
 **Or from a zip** — download it from [itch.io](https://dryflygames.itch.io/shadow2d-drop-shadows-for-unity-sprites), unzip, and drop the `Shadow2D` folder into your project's `Packages/` folder. Unity picks it up as an embedded package; no git required.
