@@ -4,7 +4,7 @@ Drop shadows for 2D sprites, split into two components because most objects in a
 
 A shadow here is a child GameObject carrying its own SpriteRenderer. It copies the caster's sprite, matches flipX and flipY, tints itself dark, and sits underneath rotated 12.5 degrees and squashed to 90% height. Those defaults live in a config asset, and they're what sells the effect as light arriving at an angle rather than a decal stuck to the floor.
 
-No lighting system, no render pipeline decision, nothing to set up before the first shadow. Add a component and it's there.
+There's no lighting system to configure and nothing to set up first. Add the component and the shadow is there.
 
 ---
 
@@ -30,16 +30,16 @@ https://github.com/amirishere101/Shadow2D-Unity.git
 "com.dryflystudio.shadow2d": "https://github.com/amirishere101/Shadow2D-Unity.git"
 ```
 
-**Or from a zip** — unzip and drop the `Shadow2D` folder into your project's `Packages/` folder. Unity picks it up as an embedded package; no git required.
+**Or from a zip** — download it from [itch.io](https://dryflygames.itch.io/shadow2d-drop-shadows-for-unity-sprites), unzip, and drop the `Shadow2D` folder into your project's `Packages/` folder. Unity picks it up as an embedded package; no git required.
 
 ## Quick start
 
 1. Select a GameObject that has a SpriteRenderer.
 2. **Add Component > DryFly Studio > Shadow 2D (Static)**.
 
-There is no step three. The shadow appears immediately, the Scene view jumps to it with the Rect tool active so you can nudge it, and the Shadow Brush opens pointed at it in case you want to reshape it. Remove the component and the shadow goes with it.
+The shadow appears immediately. The Scene view jumps to it with the Rect tool active so you can nudge it, and the Shadow Brush opens pointed at it in case you want to reshape it. Remove the component and the shadow goes with it.
 
-If the sprite animates, use **Shadow 2D (Dynamic)** instead. That's the only decision the package asks you to make, and the next section is about making it.
+If the sprite animates, use **Shadow 2D (Dynamic)** instead.
 
 ## Which component
 
@@ -139,69 +139,50 @@ They only apply as often as the component syncs. `Shadow2DDynamic` re-checks eve
 
 ## Scripting
 
-Everything lives in the `DryFlyStudio` namespace. `Shadow2DStatic` and `Shadow2DDynamic` share the same API, inherited from `Shadow2DBase`.
+Everything lives in the `DryFlyStudio` namespace, and both components share one API inherited from `Shadow2DBase`, so nothing below cares which one you have.
+
+A caster owns a list of shadows rather than a single one, so the accessors take an index and default to the first:
 
 ```csharp
 using DryFlyStudio;
 
 var caster = GetComponent<Shadow2DStatic>();
-```
 
-**Reading the shadows**
-
-```csharp
 int count = caster.ShadowCount;
+Shadow2DInstance shadow = caster.GetShadow(0);       // null if out of range
 IReadOnlyList<Shadow2DInstance> all = caster.Shadows;
-Shadow2DInstance shadow = caster.GetShadow(0);      // null if out of range
+
+GameObject obj     = caster.GetShadowObject();       // index 0 unless you say otherwise
+SpriteRenderer sr  = caster.GetShadowRenderer(0);
+SpriteRenderer src = caster.GetSourceRenderer();     // what the shadows copy from
+int which          = caster.IndexOfShadowObject(someChild);
 ```
 
-**Changing one**
-
-Each `Shadow2DInstance` owns its own appearance and transform. Set the fields, then push them:
+A `Shadow2DInstance` is plain serialized data and doesn't apply itself, which is why every edit ends with the same call:
 
 ```csharp
-shadow.color         = new Color(0f, 0f, 0.1f, 0.4f);
+shadow.color          = new Color(0f, 0f, 0.1f, 0.4f);
 shadow.overrideSprite = customSilhouette;   // null goes back to copying the caster
-shadow.material      = myMaterial;          // null uses the config's
-shadow.offset        = new Vector3(0.1f, -0.05f, 0.01f);
-shadow.rotationZ     = 30f;                 // the angle the light arrives from
-shadow.scale         = new Vector3(1f, 0.7f, 1f);
-shadow.name          = "Key light";
+shadow.material       = myMaterial;         // null uses the config's
+shadow.offset         = new Vector3(0.1f, -0.05f, 0.01f);
+shadow.rotationZ      = 30f;                // the angle the light arrives from
+shadow.scale          = new Vector3(1f, 0.7f, 1f);
+shadow.name           = "Key light";
 
-caster.UpdateShadow();                      // apply the changes
+caster.UpdateShadow();
 ```
 
-**Adding and removing**
+`UpdateShadow()` re-reads the caster and pushes sprite, flips, colour, visibility, material, sorting, transform and the self-cast mask onto every shadow. There's a narrower version, `RefreshSelfMask()`, which recomputes only the masks — it touches nothing serialized, so it's safe to call from editor code that shouldn't dirty the scene.
 
-```csharp
-Shadow2DInstance second = caster.AddShadow();   // seeded from Shadow2DConfig
-caster.RemoveShadow(1);
-caster.RemoveAllShadows();
-```
-
-**Showing and hiding** — cheaper than adding and removing, and keeps the silhouette:
+Adding and removing shadows destroys and creates GameObjects, so if you're toggling something on and off, hide it instead. That also keeps the silhouette, which removal discards:
 
 ```csharp
 caster.SetShadowActive(false);      // every shadow on this caster
 caster.SetShadowActive(true, 1);    // just the one at index 1
-```
 
-**Getting at the objects**
-
-```csharp
-GameObject obj      = caster.GetShadowObject();     // index 0 unless you say otherwise
-SpriteRenderer sr   = caster.GetShadowRenderer(0);
-SpriteRenderer src  = caster.GetSourceRenderer();   // what the shadows copy from
-int index           = caster.IndexOfShadowObject(someChild);
-```
-
-**The two sync calls**
-
-`UpdateShadow()` is the one you want almost always: it re-reads the caster and applies sprite, flips, colour, visibility, material, sorting, transform and the self-cast mask to every shadow. `RefreshSelfMask()` recomputes only the masks — useful if you've moved a shadow or its caster and want the mask to catch up without touching anything serialized.
-
-```csharp
-caster.UpdateShadow();
-caster.RefreshSelfMask();
+Shadow2DInstance second = caster.AddShadow();   // seeded from Shadow2DConfig
+caster.RemoveShadow(1);
+caster.RemoveAllShadows();
 ```
 
 ## Configuration
@@ -241,7 +222,7 @@ A tag string would have worked and cost a string comparison on every check; a ty
 
 # How it works
 
-Everything below is reasoning rather than instruction. You don't need any of it to use the package.
+None of this is needed to use the package. It's here for when a shadow is doing something you didn't ask for and you need to know what's underneath it.
 
 ## Sorting
 
